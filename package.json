@@ -1,0 +1,17 @@
+{
+  "name": "paardensprong",
+  "version": "1.0.0",
+  "description": "Simple Express app to practice the paardensprong game",
+  "main": "index.js",
+  "author": "rblinde",
+  "homepage": "https://github.com/rblinde/paardensprong",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rblinde/paardensprong.git"
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "express": "^4.17.1"
+  }
+}
