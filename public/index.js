@@ -20,6 +20,8 @@ function playSequence(sequence, squareElems) {
 function init(data) {
   const squareElems = [...document.querySelectorAll('.grid > div')];
   const answerElem = document.getElementById('answer');
+  const formElem = document.getElementById('form');
+  const inputElem = document.getElementById('input-text');
   const { word, sequence } = data;
   const letters = [...word];
 
@@ -32,11 +34,19 @@ function init(data) {
       playSequence(sequence, squareElems);
       answerElem.innerHTML = word;
     }
-
-    if (event.keyCode === 82) {
-      location.reload();
-    }
    });
+
+  formElem.addEventListener('submit', event => {
+    event.preventDefault();
+    const answer = inputElem.value;
+    if (answer != word) {
+      formElem.classList.add('wrong');
+    } else {
+      formElem.classList.remove('wrong');
+      playSequence(sequence, squareElems);
+      answerElem.innerHTML = word;
+    }
+  })
 }
 
 document.addEventListener('DOMContentLoaded', event => {
