@@ -1,54 +1,114 @@
 'use strict';
 
 /**
- * Plays correct sequence
- * @param {Array} sequence    answer sequence
- * @param {Array} squareElems DOM elements to style
+ * Paardensprong game
  */
-function playSequence(sequence, squareElems) {
-  sequence.forEach((item, idx) => {
-    setTimeout(() => {
-      squareElems[item].classList.add('active');
-    }, 300 * idx);
-  });
-}
+class Game {
+   /**
+    * Adds eventlisteners for keyboard and mouseclick
+    */
+  constructor() {
+    this.squareElems = [...document.querySelectorAll('.grid > div')];
+    this.answerElem = document.getElementById('answer');
+    this.formElem = document.getElementById('form');
+    this.inputElem = document.getElementById('input-text');
+    this.resetElem = document.getElementById('reset-button');
+    this.timeouts = [];
 
-/**
- * Starts game and adds eventlisteners for keyboard
- * @param {Object} data word and sequence from back-end
- */
-function init(data) {
-  const squareElems = [...document.querySelectorAll('.grid > div')];
-  const answerElem = document.getElementById('answer');
-  const formElem = document.getElementById('form');
-  const inputElem = document.getElementById('input-text');
-  const { word, sequence } = data;
-  const letters = [...word];
+    document.addEventListener('keydown', e => this.handleSeeAnser(e));
+    this.formElem.addEventListener('submit', e => this.handleSubmitAnswer(e));
+    this.resetElem.addEventListener('click', e => this.reset());
+  }
 
-  sequence.forEach((elem, idx) => {
-    squareElems[elem].innerHTML = letters[idx];
-  });
+  /**
+   * Fetches data from server
+   * @return {Promise} Promise containing {word, sequence}
+   */
+  getData() {
+    return fetch('/word')
+      .then(res => res.json());
+  }
 
-  document.addEventListener('keydown', event => {
-    if (event.keyCode === 32) {
-      playSequence(sequence, squareElems);
-      answerElem.innerHTML = word;
+  /**
+   * Cleans board, resets variables, and starts new game
+   */
+  reset() {
+    // Remove current timeouts
+    this.timeouts.forEach(timeout => {
+      clearTimeout(timeout);
+    });
+    this.timeouts = [];
+    // Clear input field and focus on input
+    this.inputElem.value = '';
+    this.inputElem.focus();
+    // Remove previous correct answers
+    this.squareElems.forEach(elem => {
+      elem.classList.remove('active');
+    });
+    // Remove answer
+    this.answerElem.innerHTML = '';
+
+    this.start();
+  }
+
+  /**
+   * Starts new game
+   */
+  async start() {
+    // Fetch word and lay out field
+    this.data = await this.getData();
+    const letters = [...this.data.word];
+
+    this.data.sequence.forEach((elem, idx) => {
+      this.squareElems[elem].innerHTML = letters[idx];
+    });
+  }
+
+  /**
+   * Shows correct anser if <space> is pressed
+   * @param  {Event} e fired JavaScript event
+   */
+  handleSeeAnser(e) {
+    if (e.keyCode !== 32) {
+      return;
     }
-   });
 
-  formElem.addEventListener('submit', event => {
-    event.preventDefault();
-    const answer = inputElem.value;
-    if (answer != word) {
-      formElem.classList.add('wrong');
+    this.playSequence();
+    this.answerElem.innerHTML = this.data.word;
+  }
+
+  /**
+   * Checks if answer is correct and acts accordingly
+   * @param  {Event} e fired JavaScript event
+   */
+  handleSubmitAnswer(e) {
+    const answer = this.inputElem.value;
+    e.preventDefault();
+
+    if (answer != this.data.word) {
+      this.formElem.classList.add('wrong');
+      this.inputElem.focus();
     } else {
-      formElem.classList.remove('wrong');
-      playSequence(sequence, squareElems);
-      answerElem.innerHTML = word;
+      this.formElem.classList.remove('wrong');
+      this.playSequence();
+      this.answerElem.innerHTML = this.data.word;
     }
-  })
+  }
+
+  /**
+   * Plays correct sequence
+   */
+  playSequence() {
+    this.data.sequence.forEach((item, idx) => {
+      const timeout = setTimeout(() => {
+        this.squareElems[item].classList.add('active');
+      }, 300 * idx);
+      this.timeouts.push(timeout);
+    });
+  }
 }
 
 document.addEventListener('DOMContentLoaded', event => {
-  fetch('/word').then(res => res.json()).then(res => init(res));
+  const game = new Game();
+  game.start();
 });
