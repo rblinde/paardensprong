@@ -11,7 +11,6 @@
     "url": "https://github.com/rblinde/paardensprong.git"
   },
   "dependencies": {
-    "axios": "^0.19.0",
     "express": "^4.17.1"
   }
 }

@@ -40,5 +40,5 @@ function init(data) {
 }
 
 document.addEventListener('DOMContentLoaded', event => {
-  axios.get('/word').then(res => init(res.data));
+  fetch('/word').then(res => res.json()).then(res => init(res));
 });

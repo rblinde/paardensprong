@@ -66,9 +66,4 @@ app.get('/word', (req, res) => {
   });
 });
 
-app.get('/axios.min.js', (req, res) => {
-  res.contentType('application/javascript');
-  res.sendFile(path.join(__dirname, '/node_modules/axios/dist/axios.min.js'));
-})
-
 app.listen(PORT, () => console.log(`Paardensprong started at port: ${PORT}.`));
