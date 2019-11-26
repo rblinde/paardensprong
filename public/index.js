@@ -82,7 +82,7 @@ class Game {
    * @param  {Event} e fired JavaScript event
    */
   handleSubmitAnswer(e) {
-    const answer = this.inputElem.value;
+    const answer = this.inputElem.value.toLowerCase();
     e.preventDefault();
 
     if (answer != this.data.word) {
